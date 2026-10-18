@@ -7,7 +7,7 @@ recall's tags_match='any' (which includes untagged memories) never hides it.
 
 Project list is the known universe; extend it when a new long-lived project
 appears. Keywords are matched case-insensitively against the raw turn text
-(both speakers), longest-keyword-first so 'ark ascended' beats 'ark'.
+(both speakers), longest-keyword-first.
 """
 
 from __future__ import annotations
@@ -19,10 +19,6 @@ from typing import List, Optional
 # Order inside a list does not matter; the FIRST project with any hit wins,
 # evaluated in _PROJECT_PRIORITY order so overlapping domains resolve sensibly.
 _PROJECT_KEYWORDS: dict[str, list[str]] = {
-    "ark": [
-        r"ark(?!\s*(?:-|\bserver\b))", r"ark\s*ascended", r"asa\b",
-        r"curseforge", r"bcml", r"mods?\s+de\s+ark", r"servidor\s+dedicado\s+ark",
-    ],
     "memoria": [
         r"\bhindsight\b", r"memoria\b", r"retain\b", r"recall\b", r"consolidaci[oó]n",
         r"pg0", r"cyber-?tiel", r"is_trivial_prompt", r"bank\b", r"invalidat\w+\s+memor",
@@ -32,17 +28,13 @@ _PROJECT_KEYWORDS: dict[str, list[str]] = {
         r"\bapinex\b", r"\bminimax\b", r"\bdeepseek\b", r"\bmercury\b",
         r"rate\s*limit", r"free\s*tier", r"\bEOL\b", r"check-?in",
     ],
-    "cemu": [
-        r"\bcemu\b", r"\bwiiu\b", r"\bwii\s*u\b", r"emulador", r"super\s*\+\s*r",
-    ],
     "hardware": [
-        r"\bnas\b", r"\bhdd\b", r"\bssd\b", r"\bvr?ram\b", r"\bnvidia-smi\b",
-        r"lm\s*studio", r"partici[oó]n\s+de\s+windows", r"\b8tb\b", r"\b1tb\b",
-        r"samba", r"/mnt/", r"sonido", r"bocinas", r"\btele\b",
+        r"\bhdd\b", r"\bssd\b", r"\bnvidia-smi\b",
+        r"lm\s*studio",
     ],
     "hyprland": [
         r"hyprland", r"wayland", r"waybar", r"cachyos", r"\bpacman\b",
-        r"\bproton\b", r"\bwine\b", r"\btmux\b",
+        r"\btmux\b",
     ],
     "hermes": [
         r"\bhermes\b", r"\bgateway\b", r"config\.yaml", r"\bsoul\.md\b",
@@ -56,8 +48,6 @@ _PROJECT_KEYWORDS: dict[str, list[str]] = {
 _PROJECT_PRIORITY: List[str] = [
     "memoria",
     "providers",
-    "ark",
-    "cemu",
     "hyprland",
     "hardware",
     "hermes",
