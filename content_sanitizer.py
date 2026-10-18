@@ -6,7 +6,7 @@ Implements the spotlighting technique (Hines et al., 2024):
 wraps untrusted content in XML delimiters, detects injection patterns,
 blocks markdown image exfiltration, flags suspicious URLs.
 
-Reduces attack success rate from >50% to <2%.
+Reduces attack success rate significantly through spotlighting and pattern detection.
 
 Usage:
     from content_sanitizer import sanitize_external_content, InjectionFlags

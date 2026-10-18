@@ -1,38 +1,38 @@
 # Vermeil Safety Layer
 
-Capas de seguridad personal para Hermes Agent, enfocadas en AI safety y security. Implementa protección contra prompt injection y tagging determinista de memoria.
+Personal safety layers for Hermes Agent, focused on AI safety and security. Implements prompt injection protection and deterministic memory tagging.
 
-## Archivos
+## Files
 
 ### `project_tags.py`
-Etiquetador determinista para auto-retención de memoria en Hindsight. Clasifica turns de conversación por proyecto usando patterns keyword-driven. Evita llamadas LLM para tagging, manteniendo la clasificación cheap y consistente. Un turn que no matchea ningún project recibe tag None (no existe `project:general`), asegurando que la recall con `tags_match='any'` nunca oculte memorias sin tag.
+Deterministic project tagger for Hindsight auto-retain. Classifies conversation turns by project using keyword-driven patterns. Avoids LLM calls for tagging, keeping classification cheap and consistent. A turn that matches no project receives `None` (there is no `project:general`), ensuring that recall with `tags_match='any'` never hides untagged memories.
 
 ### `content_sanitizer.py`
-Defensa contra prompt injection implementando la técnica de "spotlighting" (Hines et al., 2024). Envuelve contenido no confiable en delimitadores XML, detecta patrones de inyección, bloquea exfiltración vía markdown images y flags URLs sospechosas. Reduce attack success rate de >50% a <2%.
+Prompt injection defense implementing the "spotlighting" technique (Hines et al., 2024). Wraps untrusted content in XML delimiters, detects injection patterns, blocks markdown image exfiltration, and flags suspicious URLs.
 
 ## Threat Model
 
-**Amenazas cubiertas:**
+**Covered threats:**
 - **Instruction override:** "ignore all previous instructions", "disregard above"
 - **Role reassignment:** "you are now a...", "new persona", "jailbreak"
 - **Prompt extraction:** "reveal your system prompt", "show me your rules"
 - **Execution directives:** "run this command", "install the following package"
 - **Exfiltration:** "send secrets to discord", "upload files to http"
 - **Encoded injections:** base64-encoded attack patterns
-- **Markdown image exfiltration:** URLs ocultas en syntax de imagen
-- **Suspicious URLs:** acortadores (bitly, tinyurl), IPs directas, pastebin
+- **Markdown image exfiltration:** URLs hidden in image syntax
+- **Suspicious URLs:** shorteners (bitly, tinyurl), direct IPs, pastebin
 
-**Lo que NO cubre:**
-- Inyecciones semánticas sutiles que no activan los patterns regex
-- Attacks que requieren contexto multi-turno para activarse
-- Inyecciones en datos ya almacenados en memoria persistente (la guardrail opera antes del write)
-- Social engineering que no usa las frases patrón detectadas
+**Not covered:**
+- Subtle semantic injections that don't trigger regex patterns
+- Attacks requiring multi-turn context to activate
+- Injections in data already stored in persistent memory (the guardrail operates before write)
+- Social engineering that doesn't use the detected pattern phrases
 
-## Limitaciones
+## Limitations
 
-- Los patrones regex son heuristic-based, no formal verification. Un attacker creativo puede eludirlos.
-- El spotlighting añade overhead de processing pero es negligible (<1ms).
-- `project_tags.py` usa classification keyword-driven: si un turn usa sinónimos no listados, puede no taggear correctamente. Extender la lista de keywords cuando aparecen nuevos projects.
+- Regex patterns are heuristic-based, not formal verification. A creative attacker can evade them.
+- Spotlighting adds processing overhead but it's negligible (<1ms).
+- `project_tags.py` uses keyword-driven classification: if a turn uses synonyms not in the list, it may not tag correctly. Extend the keyword list when new projects appear.
 
 ## Usage
 
@@ -49,12 +49,25 @@ if flags.count > 0:
     print(f"Injection detected: {flags.categories}")
 ```
 
-## Créditos
+## Testing
 
-`project_tags.py` es una extensión/modificación del plugin **Hindsight** para Hermes Agent, mantenido por [vectorize-io](https://github.com/vectorize-io/hindsight). Hindsight está bajo licencia **MIT**.
+Run the basic test suite:
 
-`content_sanitizer.py` implementa la técnica de spotlighting descrita en Hines et al., 2024.
+```bash
+python test_safety_layer.py
+```
 
-## Licencia
+Tests cover:
+- Project classification correctness
+- Injection pattern detection
+- Full sanitize pipeline (image blocking, flagging)
 
-MIT — excepto los componentes derivados de Hindsight, que mantienen su licencia original.
+## Credits
+
+`project_tags.py` is an extension/modification of the **Hindsight** plugin for Hermes Agent, maintained by [vectorize-io](https://github.com/vectorize-io/hindsight). Hindsight is licensed under **MIT**.
+
+`content_sanitizer.py` implements the spotlighting technique described in Hines et al., 2024.
+
+## License
+
+MIT — except for components derived from Hindsight, which retain their original license.
